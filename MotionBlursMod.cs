@@ -35,7 +35,7 @@ namespace MotionBlurs {
 
 		public override void Load() {
 			var hamhelpmod = ModLoader.GetMod( "HamstarHelpers" );
-			var min_ver = new Version( 1, 1, 3 );
+			var min_ver = new Version( 1, 1, 4 );
 			if( hamhelpmod.Version < min_ver ) {
 				throw new Exception( "Hamstar's Helpers must be version " + min_ver.ToString() + " or greater." );
 			}

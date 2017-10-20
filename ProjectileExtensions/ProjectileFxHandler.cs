@@ -1,7 +1,10 @@
-﻿using HamstarHelpers.ProjectileHelpers;
+﻿using HamstarHelpers.DebugHelpers;
+using HamstarHelpers.ProjectileHelpers;
 using HamstarHelpers.XnaHelpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 using Terraria;
 
 
@@ -42,29 +45,35 @@ namespace MotionBlurs.ProjectileExtensions {
 		////////////////
 
 		public void RenderTrail( MotionBlursMod mymod, SpriteBatch sb, Projectile proj, Color draw_color ) {
-			Texture2D tex = Main.projectileTexture[ proj.type ];
-			int tex_height = tex.Height / Main.projFrames[proj.type];
-			Rectangle frame = new Rectangle( 0, proj.frame * tex_height, tex.Width, tex_height );
+			int lit = (int)Math.Min( mymod.Config.Data.ProjMaxIntensity, (float)mymod.Config.Data.ProjBaseIntensity * proj.velocity.Length() );
+			if( lit <= 8 ) { return; }
 
-			float motion_intensity_scale = proj.velocity.Length() * mymod.Config.Data.ProjMotionScale;
-			int lit = (int)((float)mymod.Config.Data.ProjHighestIntensity * motion_intensity_scale);
-			int darken = lit / mymod.Config.Data.ProjTrailLength;
+			Color base_color = proj.GetAlpha( draw_color );
 
-			if( lit <= 8 || darken == 0 ) { return; }
+			float avg = (float)(base_color.R + base_color.G + base_color.B + base_color.A) / 4f;
+			float scale = lit / avg;
 
-			Color color = draw_color;
-			while( color.A > lit ) {
-				color = XnaColorHelpers.Add( color, -darken, true );
-			}
-//DebugHelpers.SetDisplay( "proj", "intensity "+motion_intensity_scale.ToString("N1")+ ", draw "+draw_color+", alpha'd "+proj.GetAlpha( draw_color )+" color "+ color, 30 );
-//DebugHelpers.SetDisplay( "proj", "base "+proj.GetAlpha( draw_color )+" color "+ color, 30 );
-			
+			Color color = Color.Multiply( base_color, scale );
+
+			float re_avg = (float)(color.R + color.G + color.B + color.A) / 4f;
+			float inc = mymod.Config.Data.ProjTrailFadeIncrements / re_avg;
+
+//DebugHelpers.SetDisplay( proj.Name + "_info", "lit:"+lit+", avg: "+ re_avg.ToString("N2")+", inc:"+inc.ToString("N2")+ ", scale:"+ scale.ToString("N2"), 30 );
+//DebugHelpers.SetDisplay( proj.Name + "_colors", "base:" + base_color + ", color:" + color, 30 );
+//var list = new List<string>();
 			for( int i = 0; i <= this.CurrentTrailLength; i++ ) {
-				ProjectileHelpers.DrawSimple( sb, proj, this.TrailPositions[i], this.TrailRotations[i], color, proj.scale );
+				float rot = this.TrailRotations[i];
+				Vector2 pos = this.TrailPositions[i];
 
-				color = XnaColorHelpers.Add( color, -darken, true );
-				if( color.A <= 8 ) { break; }
+				float lerp = i * inc;
+
+				Color lerped_color = Color.Lerp( color, Color.Transparent, lerp );
+				if( lerped_color.A <= 8 ) { break; }
+
+				ProjectileHelpers.DrawSimple( sb, proj, pos, rot, lerped_color, proj.scale );
+//list.Add( "R:" + lerped_color.R + "+G:" + lerped_color.G + "+B:" + lerped_color.B+"+A:" + lerped_color.A );
 			}
+//DebugHelpers.SetDisplay( proj.Name + "_trail", string.Join(", ",list.ToArray()), 30 );
 		}
 	}
 }

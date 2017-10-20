@@ -9,6 +9,7 @@ using Terraria.ModLoader;
 namespace MotionBlurs {
 	class MyNpcInfo : AltNPCInfo {
 		public NpcFxHandler Fx { get; private set; }
+		public Color PrevColor = Color.White;
 
 
 		////////////////
@@ -32,17 +33,25 @@ namespace MotionBlurs {
 
 
 	class MyGlobalNpc : GlobalNPC {
-		public override bool PreDraw( NPC npc, SpriteBatch sb, Color draw_color ) {
+		public override bool PreDraw( NPC npc, SpriteBatch sb, Color _ ) {
 			var mymod = (MotionBlursMod)this.mod;
-			if( !mymod.IsEnabled() ) { return base.PreDraw( npc, sb, draw_color ); }
+			if( !mymod.IsEnabled() ) { return base.PreDraw( npc, sb, _ ); }
 
 			var npc_info = MyNpcInfo.GetNpcInfo<MyNpcInfo>( npc.whoAmI );
 
 			if( npc_info != null ) {
-				npc_info.Fx.RenderTrail( mymod, sb, npc, draw_color );
+				npc_info.Fx.RenderTrail( mymod, sb, npc, _ );
 			}
 			
-			return base.PreDraw( npc, sb, draw_color );
+			return base.PreDraw( npc, sb, _ );
+		}
+
+		public override void PostDraw( NPC npc, SpriteBatch sb, Color draw_color ) {
+			var npc_info = MyNpcInfo.GetNpcInfo<MyNpcInfo>( npc.whoAmI );
+
+			if( npc_info != null ) {
+				npc_info.PrevColor = draw_color;
+			}
 		}
 	}
 }

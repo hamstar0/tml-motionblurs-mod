@@ -59,6 +59,7 @@
     <Compile Include="NpcExtensions\NpcFxHandler.cs" />
     <Compile Include="ProjectileExtensions\ProjectileFxHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MyUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="build.txt" />

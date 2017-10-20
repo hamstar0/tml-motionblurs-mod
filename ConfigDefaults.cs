@@ -3,7 +3,7 @@
 
 namespace MotionBlurs {
 	public class MotionBlursConfigData {
-		public readonly static Version ConfigVersion = new Version( 1, 0, 0 );
+		public readonly static Version ConfigVersion = new Version( 1, 1, 0 );
 
 
 		public string VersionSinceUpdate = "";
@@ -13,11 +13,14 @@ namespace MotionBlurs {
 		public int NpcTrailLength = 10;
 		public int ProjTrailLength = 10;
 
-		public int NpcHighestIntensity = 72;
-		public int ProjHighestIntensity = 64;
+		public float NpcTrailFadeIncrements = 8f;
+		public float ProjTrailFadeIncrements = 10f;
 
-		public float NpcMotionScale = 1f / 8f;
-		public float ProjMotionScale = 1f / 10f;
+		public int NpcBaseIntensity = 10;
+		public int ProjBaseIntensity = 8;
+
+		public int NpcMaxIntensity = 128;
+		public int ProjMaxIntensity = 96;
 
 
 
@@ -32,10 +35,27 @@ namespace MotionBlurs {
 			if( vers_since >= MotionBlursConfigData.ConfigVersion ) {
 				return false;
 			}
-			
+
+			if( vers_since < new Version( 1, 1, 0 ) ) {
+				if( MotionBlursConfigData._1_0_0_NpcHighestIntensity == this.NpcBaseIntensity ) {
+					this.NpcBaseIntensity = new_config.NpcBaseIntensity;
+				}
+				if( MotionBlursConfigData._1_0_0_ProjHighestIntensity == this.ProjBaseIntensity ) {
+					this.ProjBaseIntensity = new_config.ProjBaseIntensity;
+				}
+			}
+
 			this.VersionSinceUpdate = MotionBlursConfigData.ConfigVersion.ToString();
 
 			return true;
 		}
+
+
+		////////////////
+
+		public string _OLD_SETTINGS_BELOW = "";
+
+		public readonly static float _1_0_0_NpcHighestIntensity = 72;
+		public readonly static float _1_0_0_ProjHighestIntensity = 64;
 	}
 }

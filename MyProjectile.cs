@@ -40,6 +40,7 @@ namespace MotionBlurs {
 			if( !mymod.IsEnabled() ) { return base.PreDraw( projectile, sb, light_color ); }
 
 			var proj_info = MyProjectileInfo.GetProjInfo<MyProjectileInfo>( projectile.whoAmI );
+
 			if( proj_info != null ) {
 				proj_info.Fx.RenderTrail( mymod, sb, projectile, light_color );
 			}

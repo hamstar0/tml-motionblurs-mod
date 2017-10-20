@@ -1,3 +1,13 @@
-Adds motion blur effects to projectiles and npcs. Instant epic mode. Adjust settings if laggy.
+Adds motion blur effects to projectiles and npcs. Instant epic mode. Adjust settings if laggy or not to your taste.
 - Config: Documents/My Games/Terraria/ModLoader/Mod Configs/Motion Blurs Config.json
 - Source: https://github.com/hamstar0/tml-motionblurs-mod
+
+
+
+Changelog:
+v1.1.0
+- Revised trail fx renderers completely
+- Improved trail appearance considerably
+- Now requires Hamstar Helpers v1.1.4
+v1.0.0
+- First release
