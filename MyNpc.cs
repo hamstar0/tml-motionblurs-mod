@@ -18,7 +18,7 @@ namespace MotionBlurs {
 		}
 
 		public override void Initialize( NPC npc ) {
-			this.Fx = new NpcFxHandler( MotionBlursMod.instance );
+			this.Fx = new NpcFxHandler( MotionBlursMod.Instance );
 		}
 
 		////////////////

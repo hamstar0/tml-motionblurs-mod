@@ -20,7 +20,7 @@ namespace MotionBlurs {
 		}
 
 		public override void Initialize( Projectile projectile ) {
-			this.Fx = new ProjectileFxHandler( MotionBlursMod.instance );
+			this.Fx = new ProjectileFxHandler( MotionBlursMod.Instance );
 		}
 
 

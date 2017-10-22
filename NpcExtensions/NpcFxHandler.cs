@@ -7,11 +7,19 @@ using Terraria;
 
 namespace MotionBlurs.NpcExtensions {
 	class NpcFxHandler {
+		public static int GetDefaultNpcIntensity( MotionBlursConfigData data, NPC npc ) {
+			return (int)Math.Min( data.NpcMaxIntensity, (float)data.NpcBaseIntensity * npc.velocity.Length() );
+		}
+
+
+		////////////////
+
 		private Vector2[] TrailPositions;
 		private float[] TrailRotations;
-		private int? CustomIntensity = null;
 
 		private int CurrentTrailLength = 0;
+
+		public Func<Entity, int> IntensityGetter { get; private set; }
 
 
 		////////////////
@@ -21,6 +29,8 @@ namespace MotionBlurs.NpcExtensions {
 
 			this.TrailPositions = new Vector2[len];
 			this.TrailRotations = new float[len];
+
+			this.IntensityGetter = null;
 		}
 
 		////////////////
@@ -42,12 +52,6 @@ namespace MotionBlurs.NpcExtensions {
 
 		////////////////
 
-		public void SetCustomIntensity( int? intensity ) {
-			this.CustomIntensity = intensity;
-		}
-
-		////////////////
-
 		public void GetRenderColors( NPC npc, Color draw_color, int intensity, out Color main_color, out Color? overlay_color ) {
 			Color base_color_a, base_color_b = default( Color );
 			bool has_added_color = npc.color != default( Color );
@@ -65,13 +69,23 @@ namespace MotionBlurs.NpcExtensions {
 		}
 
 		public int GetNpcIntensity( MotionBlursMod mymod, NPC npc ) {
-			return (int)Math.Min( mymod.Config.Data.NpcMaxIntensity, (float)mymod.Config.Data.NpcBaseIntensity * npc.velocity.Length() );
+			if( this.IntensityGetter != null ) {
+				return this.IntensityGetter( npc );
+			}
+			return NpcFxHandler.GetDefaultNpcIntensity( mymod.Config.Data, npc );
 		}
 
 		////////////////
 
+		public void SetCustomIntensity( Func<Entity, int> intensity_func ) {
+			this.IntensityGetter = intensity_func;
+		}
+
+
+		////////////////
+
 		public void RenderTrail( MotionBlursMod mymod, SpriteBatch sb, NPC npc, Color draw_color ) {
-			int intensity = this.CustomIntensity.HasValue ? (int)this.CustomIntensity : (int)this.GetNpcIntensity( mymod, npc );
+			int intensity = this.GetNpcIntensity( mymod, npc );
 			if( intensity <= 8 ) { return; }
 
 			Color main_color;

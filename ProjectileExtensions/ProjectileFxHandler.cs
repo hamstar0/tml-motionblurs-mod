@@ -7,11 +7,19 @@ using Terraria;
 
 namespace MotionBlurs.ProjectileExtensions {
 	class ProjectileFxHandler {
+		public static int GetDefaultProjectileIntensity( MotionBlursConfigData data, Projectile proj ) {
+			return (int)Math.Min( data.ProjMaxIntensity, (float)data.ProjBaseIntensity * proj.velocity.Length() );
+		}
+
+
+		////////////////
+
 		private Vector2[] TrailPositions;
 		private float[] TrailRotations;
-		private int? CustomIntensity = null;
 
 		private int CurrentTrailLength = 0;
+
+		public Func<Entity, int> IntensityGetter { get; private set; }
 
 
 		////////////////
@@ -21,6 +29,8 @@ namespace MotionBlurs.ProjectileExtensions {
 
 			this.TrailPositions = new Vector2[len];
 			this.TrailRotations = new float[len];
+			this.IntensityGetter = null;
+			;
 		}
 
 		////////////////
@@ -42,12 +52,6 @@ namespace MotionBlurs.ProjectileExtensions {
 
 		////////////////
 
-		public void SetCustomIntensity( int? intensity ) {
-			this.CustomIntensity = intensity;
-		}
-
-		////////////////
-
 		public void GetRenderColors( Projectile proj, Color draw_color, int intensity, out Color main_color ) {
 			Color base_color = proj.GetAlpha( draw_color );
 
@@ -58,13 +62,23 @@ namespace MotionBlurs.ProjectileExtensions {
 		}
 
 		public int GetProjectileIntensity( MotionBlursMod mymod, Projectile proj ) {
-			return (int)Math.Min( mymod.Config.Data.ProjMaxIntensity, (float)mymod.Config.Data.ProjBaseIntensity * proj.velocity.Length() );
+			if( this.IntensityGetter != null ) {
+				return this.IntensityGetter( proj );
+			}
+			return ProjectileFxHandler.GetDefaultProjectileIntensity( mymod.Config.Data, proj );
 		}
 
 		////////////////
 
+		public void SetCustomIntensity( Func<Entity, int> intensity_func ) {
+			this.IntensityGetter = intensity_func;
+		}
+
+
+		////////////////
+
 		public void RenderTrail( MotionBlursMod mymod, SpriteBatch sb, Projectile proj, Color draw_color ) {
-			int intensity = this.CustomIntensity.HasValue ? (int)this.CustomIntensity : (int)this.GetProjectileIntensity( mymod, proj );
+			int intensity = this.GetProjectileIntensity( mymod, proj );
 			if( intensity <= 8 ) { return; }
 
 			Color main_color;
