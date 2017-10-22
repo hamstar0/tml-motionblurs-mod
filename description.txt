@@ -5,6 +5,8 @@ Adds motion blur effects to projectiles and npcs. Instant epic mode. Adjust sett
 
 
 Changelog:
+v1.1.1
+- Added public API to apply custom blurs
 v1.1.0
 - Revised trail fx renderers completely
 - Improved trail appearance considerably

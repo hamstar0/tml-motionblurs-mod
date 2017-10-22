@@ -9,7 +9,6 @@ using Terraria.ModLoader;
 namespace MotionBlurs {
 	class MyNpcInfo : AltNPCInfo {
 		public NpcFxHandler Fx { get; private set; }
-		public Color PrevColor = Color.White;
 
 
 		////////////////
@@ -19,8 +18,7 @@ namespace MotionBlurs {
 		}
 
 		public override void Initialize( NPC npc ) {
-			var mymod = (MotionBlursMod)ModLoader.GetMod( "MotionBlurs" );
-			this.Fx = new NpcFxHandler( mymod );
+			this.Fx = new NpcFxHandler( MotionBlursMod.instance );
 		}
 
 		////////////////
@@ -30,28 +28,21 @@ namespace MotionBlurs {
 		}
 	}
 
-
+	
+	////////////////
 
 	class MyGlobalNpc : GlobalNPC {
-		public override bool PreDraw( NPC npc, SpriteBatch sb, Color _ ) {
+		public override bool PreDraw( NPC npc, SpriteBatch sb, Color draw_color ) {
 			var mymod = (MotionBlursMod)this.mod;
-			if( !mymod.IsEnabled() ) { return base.PreDraw( npc, sb, _ ); }
+			if( !mymod.IsEnabled() ) { return base.PreDraw( npc, sb, draw_color ); }
 
 			var npc_info = MyNpcInfo.GetNpcInfo<MyNpcInfo>( npc.whoAmI );
 
 			if( npc_info != null ) {
-				npc_info.Fx.RenderTrail( mymod, sb, npc, _ );
+				npc_info.Fx.RenderTrail( mymod, sb, npc, draw_color );
 			}
 			
-			return base.PreDraw( npc, sb, _ );
-		}
-
-		public override void PostDraw( NPC npc, SpriteBatch sb, Color draw_color ) {
-			var npc_info = MyNpcInfo.GetNpcInfo<MyNpcInfo>( npc.whoAmI );
-
-			if( npc_info != null ) {
-				npc_info.PrevColor = draw_color;
-			}
+			return base.PreDraw( npc, sb, draw_color );
 		}
 	}
 }

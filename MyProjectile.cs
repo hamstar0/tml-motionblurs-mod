@@ -20,8 +20,7 @@ namespace MotionBlurs {
 		}
 
 		public override void Initialize( Projectile projectile ) {
-			var mymod = (MotionBlursMod)ModLoader.GetMod( "MotionBlurs" );
-			this.Fx = new ProjectileFxHandler( mymod );
+			this.Fx = new ProjectileFxHandler( MotionBlursMod.instance );
 		}
 
 
@@ -33,7 +32,8 @@ namespace MotionBlurs {
 	}
 
 
-	
+	////////////////
+
 	class MyProjectile : GlobalProjectile {
 		public override bool PreDraw( Projectile projectile, SpriteBatch sb, Color light_color ) {
 			var mymod = (MotionBlursMod)this.mod;

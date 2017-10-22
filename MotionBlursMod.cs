@@ -1,20 +1,61 @@
 ﻿using HamstarHelpers.DebugHelpers;
 using HamstarHelpers.Utilities.Config;
 using System;
+using Terraria;
 using Terraria.ModLoader;
 
 
 namespace MotionBlurs {
 	public static class MotionBlursModSettings {
 		public static MotionBlursConfigData Get() {
-			var mymod = (MotionBlursMod)ModLoader.GetMod( "MotionBlurs" );
-			return mymod.Config.Data;
+			return MotionBlursMod.instance.Config.Data;
+		}
+	}
+
+
+	public static class MotionBlursAPI {
+		public static void BeginCustomEntityBlur( Entity ent, int intensity ) {
+			if( ent is NPC ) {
+				var npc_info = MyNpcInfo.GetNpcInfo<MyNpcInfo>( ent.whoAmI );
+				if( npc_info == null ) { return; }
+
+				npc_info.Fx.SetCustomIntensity( intensity );
+			} else if( ent is Projectile ) {
+				var proj_info = MyProjectileInfo.GetProjInfo<MyProjectileInfo>( ent.whoAmI );
+				if( proj_info == null ) { return; }
+
+				proj_info.Fx.SetCustomIntensity( intensity );
+			} else {
+				throw new Exception("Invalid entity type.");
+			}
+		}
+
+
+		public static void EndCustomEntityBlur( Entity ent ) {
+			if( ent is NPC ) {
+				var npc_info = MyNpcInfo.GetNpcInfo<MyNpcInfo>( ent.whoAmI );
+				if( npc_info == null ) { return; }
+
+				npc_info.Fx.SetCustomIntensity( null );
+			} else if( ent is Projectile ) {
+				var proj_info = MyProjectileInfo.GetProjInfo<MyProjectileInfo>( ent.whoAmI );
+				if( proj_info == null ) { return; }
+
+				proj_info.Fx.SetCustomIntensity( null );
+			} else {
+				throw new Exception( "Invalid entity type." );
+			}
 		}
 	}
 
 
 
     class MotionBlursMod : Mod {
+		public static MotionBlursMod instance { get; private set; }
+
+		
+		////////////////
+
 		public JsonConfig<MotionBlursConfigData> Config { get; private set; }
 
 
@@ -34,6 +75,8 @@ namespace MotionBlurs {
 		////////////////
 
 		public override void Load() {
+			MotionBlursMod.instance = this;
+
 			var hamhelpmod = ModLoader.GetMod( "HamstarHelpers" );
 			var min_ver = new Version( 1, 1, 4 );
 			if( hamhelpmod.Version < min_ver ) {
@@ -41,6 +84,10 @@ namespace MotionBlurs {
 			}
 
 			this.LoadConfig();
+		}
+
+		public override void Unload() {
+			MotionBlursMod.instance = null;
 		}
 
 

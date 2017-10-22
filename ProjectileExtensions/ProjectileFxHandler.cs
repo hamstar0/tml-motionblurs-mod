@@ -1,10 +1,7 @@
-﻿using HamstarHelpers.DebugHelpers;
-using HamstarHelpers.ProjectileHelpers;
-using HamstarHelpers.XnaHelpers;
+﻿using HamstarHelpers.ProjectileHelpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using Terraria;
 
 
@@ -12,7 +9,8 @@ namespace MotionBlurs.ProjectileExtensions {
 	class ProjectileFxHandler {
 		private Vector2[] TrailPositions;
 		private float[] TrailRotations;
-		
+		private int? CustomIntensity = null;
+
 		private int CurrentTrailLength = 0;
 
 
@@ -44,20 +42,43 @@ namespace MotionBlurs.ProjectileExtensions {
 
 		////////////////
 
-		public void RenderTrail( MotionBlursMod mymod, SpriteBatch sb, Projectile proj, Color draw_color ) {
-			int lit = (int)Math.Min( mymod.Config.Data.ProjMaxIntensity, (float)mymod.Config.Data.ProjBaseIntensity * proj.velocity.Length() );
-			if( lit <= 8 ) { return; }
+		public void SetCustomIntensity( int? intensity ) {
+			this.CustomIntensity = intensity;
+		}
 
+		////////////////
+
+		public void GetRenderColors( Projectile proj, Color draw_color, int intensity, out Color main_color ) {
 			Color base_color = proj.GetAlpha( draw_color );
 
 			float avg = (float)(base_color.R + base_color.G + base_color.B + base_color.A) / 4f;
-			float scale = lit / avg;
+			float scale = intensity / avg;
 
-			Color color = Color.Multiply( base_color, scale );
+			main_color = Color.Multiply( base_color, scale );
+		}
 
-			float re_avg = (float)(color.R + color.G + color.B + color.A) / 4f;
-			float inc = mymod.Config.Data.ProjTrailFadeIncrements / re_avg;
+		public int GetProjectileIntensity( MotionBlursMod mymod, Projectile proj ) {
+			return (int)Math.Min( mymod.Config.Data.ProjMaxIntensity, (float)mymod.Config.Data.ProjBaseIntensity * proj.velocity.Length() );
+		}
 
+		////////////////
+
+		public void RenderTrail( MotionBlursMod mymod, SpriteBatch sb, Projectile proj, Color draw_color ) {
+			int intensity = this.CustomIntensity.HasValue ? (int)this.CustomIntensity : (int)this.GetProjectileIntensity( mymod, proj );
+			if( intensity <= 8 ) { return; }
+
+			Color main_color;
+
+			this.GetRenderColors( proj, draw_color, intensity, out main_color );
+
+			float re_avg = (float)(main_color.R + main_color.G + main_color.B + main_color.A) / 4f;
+			float fade_amount = mymod.Config.Data.ProjTrailFadeIncrements / re_avg;
+
+			this.RenderTrailWithSettings( sb, proj, main_color, fade_amount );
+		}
+
+
+		public void RenderTrailWithSettings( SpriteBatch sb, Projectile proj, Color main_color, float fade_amount ) {
 //DebugHelpers.SetDisplay( proj.Name + "_info", "lit:"+lit+", avg: "+ re_avg.ToString("N2")+", inc:"+inc.ToString("N2")+ ", scale:"+ scale.ToString("N2"), 30 );
 //DebugHelpers.SetDisplay( proj.Name + "_colors", "base:" + base_color + ", color:" + color, 30 );
 //var list = new List<string>();
@@ -65,9 +86,9 @@ namespace MotionBlurs.ProjectileExtensions {
 				float rot = this.TrailRotations[i];
 				Vector2 pos = this.TrailPositions[i];
 
-				float lerp = i * inc;
+				float lerp = i * fade_amount;
 
-				Color lerped_color = Color.Lerp( color, Color.Transparent, lerp );
+				Color lerped_color = Color.Lerp( main_color, Color.Transparent, lerp );
 				if( lerped_color.A <= 8 ) { break; }
 
 				ProjectileHelpers.DrawSimple( sb, proj, pos, rot, lerped_color, proj.scale );
