@@ -1,19 +1,18 @@
 ﻿using HamstarHelpers.DebugHelpers;
 using HamstarHelpers.Utilities.Config;
 using System;
+using System.IO;
 using Terraria;
 using Terraria.ModLoader;
 
 
 namespace MotionBlurs {
-	public static class MotionBlursModSettings {
-		public static MotionBlursConfigData Get() {
+	public static class MotionBlursAPI {
+		public static MotionBlursConfigData GetModSettings() {
 			return MotionBlursMod.Instance.Config.Data;
 		}
-	}
 
 
-	public static class MotionBlursAPI {
 		public static void BeginCustomEntityBlur( Entity ent, Func<Entity, int> intensity_func ) {
 			if( ent is NPC ) {
 				var npc_info = MyNpcInfo.GetNpcInfo<MyNpcInfo>( ent.whoAmI );
@@ -51,6 +50,21 @@ namespace MotionBlurs {
 
 
     class MotionBlursMod : Mod {
+		public static string GithubUserName { get { return "hamstar0"; } }
+		public static string GithubProjectName { get { return "tml-motionblurs-mod"; } }
+
+		public static string ConfigRelativeFilePath {
+			get { return ConfigurationDataBase.RelativePath + Path.DirectorySeparatorChar + MotionBlursConfigData.ConfigFileName; }
+		}
+		public static void ReloadConfigFromFile() {
+			if( Main.netMode != 0 ) {
+				throw new Exception( "Cannot reload configs outside of single player." );
+			}
+			if( MotionBlursMod.Instance != null ) {
+				MotionBlursMod.Instance.Config.LoadFile();
+			}
+		}
+		
 		public static MotionBlursMod Instance { get; private set; }
 
 		
@@ -67,9 +81,9 @@ namespace MotionBlurs {
 				AutoloadGores = true,
 				AutoloadSounds = true
 			};
-
-			string filename = "Motion Blurs Config.json";
-			this.Config = new JsonConfig<MotionBlursConfigData>( filename, "Mod Configs", new MotionBlursConfigData() );
+			
+			this.Config = new JsonConfig<MotionBlursConfigData>( MotionBlursConfigData.ConfigFileName,
+				ConfigurationDataBase.RelativePath, new MotionBlursConfigData() );
 		}
 
 		////////////////
@@ -78,7 +92,7 @@ namespace MotionBlurs {
 			MotionBlursMod.Instance = this;
 
 			var hamhelpmod = ModLoader.GetMod( "HamstarHelpers" );
-			var min_ver = new Version( 1, 1, 4 );
+			var min_ver = new Version( 1, 2, 0 );
 			if( hamhelpmod.Version < min_ver ) {
 				throw new Exception( "Hamstar's Helpers must be version " + min_ver.ToString() + " or greater." );
 			}

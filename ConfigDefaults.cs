@@ -1,10 +1,14 @@
-﻿using System;
+﻿using HamstarHelpers.Utilities.Config;
+using System;
 
 
 namespace MotionBlurs {
-	public class MotionBlursConfigData {
+	public class MotionBlursConfigData : ConfigurationDataBase {
 		public readonly static Version ConfigVersion = new Version( 1, 1, 0 );
+		public readonly static string ConfigFileName = "Motion Blurs Config.json";
 
+
+		////////////////
 
 		public string VersionSinceUpdate = "";
 
