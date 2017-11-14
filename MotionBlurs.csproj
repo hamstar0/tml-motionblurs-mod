@@ -52,6 +52,7 @@
     <Reference Include="Microsoft.Xna.Framework.Graphics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API.cs" />
     <Compile Include="ConfigDefaults.cs" />
     <Compile Include="MotionBlursMod.cs" />
     <Compile Include="MyNpc.cs" />
