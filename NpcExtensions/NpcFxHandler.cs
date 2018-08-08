@@ -1,4 +1,4 @@
-﻿using HamstarHelpers.NPCHelpers;
+﻿using HamstarHelpers.Helpers.NPCHelpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -25,7 +25,7 @@ namespace MotionBlurs.NpcExtensions {
 		////////////////
 
 		public NpcFxHandler( MotionBlursMod mymod ) {
-			int len = mymod.Config.Data.NpcTrailLength;
+			int len = mymod.ConfigJson.Data.NpcTrailLength;
 
 			this.TrailPositions = new Vector2[len];
 			this.TrailRotations = new float[len];
@@ -72,7 +72,7 @@ namespace MotionBlurs.NpcExtensions {
 			if( this.IntensityGetter != null ) {
 				return this.IntensityGetter( npc );
 			}
-			return NpcFxHandler.GetDefaultNpcIntensity( mymod.Config.Data, npc );
+			return NpcFxHandler.GetDefaultNpcIntensity( mymod.ConfigJson.Data, npc );
 		}
 
 		////////////////
@@ -94,7 +94,7 @@ namespace MotionBlurs.NpcExtensions {
 			this.GetRenderColors( npc, draw_color, intensity, out main_color, out overlay_color );
 
 			float re_avg = (float)(main_color.R + main_color.G + main_color.B + main_color.A) / 4f;
-			float inc = mymod.Config.Data.NpcTrailFadeIncrements / re_avg;
+			float inc = mymod.ConfigJson.Data.NpcTrailFadeIncrements / re_avg;
 
 			this.RenderTrailWithSettings( sb, npc, main_color, overlay_color, inc );
 		}

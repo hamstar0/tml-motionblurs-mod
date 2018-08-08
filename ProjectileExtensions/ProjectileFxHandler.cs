@@ -1,4 +1,4 @@
-﻿using HamstarHelpers.ProjectileHelpers;
+﻿using HamstarHelpers.Helpers.ProjectileHelpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -25,7 +25,7 @@ namespace MotionBlurs.ProjectileExtensions {
 		////////////////
 
 		public ProjectileFxHandler( MotionBlursMod mymod ) {
-			int len = mymod.Config.Data.ProjTrailLength;
+			int len = mymod.ConfigJson.Data.ProjTrailLength;
 
 			this.TrailPositions = new Vector2[len];
 			this.TrailRotations = new float[len];
@@ -65,7 +65,7 @@ namespace MotionBlurs.ProjectileExtensions {
 			if( this.IntensityGetter != null ) {
 				return this.IntensityGetter( proj );
 			}
-			return ProjectileFxHandler.GetDefaultProjectileIntensity( mymod.Config.Data, proj );
+			return ProjectileFxHandler.GetDefaultProjectileIntensity( mymod.ConfigJson.Data, proj );
 		}
 
 		////////////////
@@ -86,7 +86,7 @@ namespace MotionBlurs.ProjectileExtensions {
 			this.GetRenderColors( proj, draw_color, intensity, out main_color );
 
 			float re_avg = (float)(main_color.R + main_color.G + main_color.B + main_color.A) / 4f;
-			float fade_amount = mymod.Config.Data.ProjTrailFadeIncrements / re_avg;
+			float fade_amount = mymod.ConfigJson.Data.ProjTrailFadeIncrements / re_avg;
 
 			this.RenderTrailWithSettings( sb, proj, main_color, fade_amount );
 		}

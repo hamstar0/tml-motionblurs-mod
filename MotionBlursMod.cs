@@ -1,5 +1,5 @@
-﻿using HamstarHelpers.DebugHelpers;
-using HamstarHelpers.Utilities.Config;
+﻿using HamstarHelpers.Components.Config;
+using HamstarHelpers.Helpers.DebugHelpers;
 using System;
 using System.IO;
 using Terraria;
@@ -20,13 +20,30 @@ namespace MotionBlurs {
 			if( Main.netMode != 0 ) {
 				throw new Exception( "Cannot reload configs outside of single player." );
 			}
-			MotionBlursMod.Instance.Config.LoadFile();
+			if( MotionBlursMod.Instance != null ) {
+				if( !MotionBlursMod.Instance.ConfigJson.LoadFile() ) {
+					MotionBlursMod.Instance.ConfigJson.SaveFile();
+				}
+			}
 		}
-		
-		
+
+		public static void ResetConfigFromDefaults() {
+			if( Main.netMode != 0 ) {
+				throw new Exception( "Cannot reset to default configs outside of single player." );
+			}
+
+			var new_config = new MotionBlursConfigData();
+			//new_config.SetDefaults();
+
+			MotionBlursMod.Instance.ConfigJson.SetData( new_config );
+			MotionBlursMod.Instance.ConfigJson.SaveFile();
+		}
+
+
 		////////////////
 
-		public JsonConfig<MotionBlursConfigData> Config { get; private set; }
+		public JsonConfig<MotionBlursConfigData> ConfigJson { get; private set; }
+		public MotionBlursConfigData Config { get { return this.ConfigJson.Data; } }
 
 
 		////////////////
@@ -38,7 +55,7 @@ namespace MotionBlurs {
 				AutoloadSounds = true
 			};
 			
-			this.Config = new JsonConfig<MotionBlursConfigData>( MotionBlursConfigData.ConfigFileName,
+			this.ConfigJson = new JsonConfig<MotionBlursConfigData>( MotionBlursConfigData.ConfigFileName,
 				ConfigurationDataBase.RelativePath, new MotionBlursConfigData() );
 		}
 
@@ -46,13 +63,7 @@ namespace MotionBlurs {
 
 		public override void Load() {
 			MotionBlursMod.Instance = this;
-
-			var hamhelpmod = ModLoader.GetMod( "HamstarHelpers" );
-			var min_ver = new Version( 1, 2, 0 );
-			if( hamhelpmod.Version < min_ver ) {
-				throw new Exception( "Hamstar Helpers must be version " + min_ver.ToString() + " or greater." );
-			}
-
+			
 			this.LoadConfig();
 		}
 
@@ -63,31 +74,25 @@ namespace MotionBlurs {
 
 		private void LoadConfig() {
 			try {
-				if( !this.Config.LoadFile() ) {
-					this.Config.SaveFile();
+				if( !this.ConfigJson.LoadFile() ) {
+					this.ConfigJson.SaveFile();
 				}
 			} catch( Exception e ) {
-				DebugHelpers.Log( e.Message );
-				this.Config.SaveFile();
+				LogHelpers.Log( e.Message );
+				this.ConfigJson.SaveFile();
 			}
 
-			if( this.Config.Data.UpdateToLatestVersion() ) {
+			if( this.ConfigJson.Data.UpdateToLatestVersion() ) {
 				ErrorLogger.Log( "Motion Blurs updated to " + MotionBlursConfigData.ConfigVersion.ToString() );
-				this.Config.SaveFile();
+				this.ConfigJson.SaveFile();
 			}
-		}
-
-
-		public override void PostSetupContent() {
-			MyNpcInfo.RegisterInfoType<MyNpcInfo>();
-			MyProjectileInfo.RegisterInfoType<MyProjectileInfo>();
 		}
 
 
 		////////////////
 
 		public bool IsEnabled() {
-			return this.Config.Data.Enabled;
+			return this.ConfigJson.Data.Enabled;
 		}
 	}
 }

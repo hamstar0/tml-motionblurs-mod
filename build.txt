@@ -1,8 +1,9 @@
 author = hamstar
-version = 1.2.0
+version = 1.2.1
 displayName = Motion Blurs
-modReferences = HamstarHelpers
-buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*
+modReferences = HamstarHelpers@2.0.1
+buildIgnore = *.csproj, *.user, *.bat, obj\*, bin\*, .vs\*, .git\*
 includePDB = true
+languageVersion = 6
 side = Client
 homepage = https://forums.terraria.org/index.php?threads/motion-blurs-instant-epic-mode.62766/
