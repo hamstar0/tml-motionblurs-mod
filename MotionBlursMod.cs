@@ -1,65 +1,24 @@
 ﻿using HamstarHelpers.Components.Config;
 using HamstarHelpers.Helpers.DebugHelpers;
 using System;
-using System.IO;
-using Terraria;
 using Terraria.ModLoader;
 
 
 namespace MotionBlurs {
-    class MotionBlursMod : Mod {
-		public static MotionBlursMod Instance { get; private set; }
-
-		public static string GithubUserName { get { return "hamstar0"; } }
-		public static string GithubProjectName { get { return "tml-motionblurs-mod"; } }
-
-		public static string ConfigFileRelativePath {
-			get { return ConfigurationDataBase.RelativePath + Path.DirectorySeparatorChar + MotionBlursConfigData.ConfigFileName; }
-		}
-		public static void ReloadConfigFromFile() {
-			if( Main.netMode != 0 ) {
-				throw new Exception( "Cannot reload configs outside of single player." );
-			}
-			if( MotionBlursMod.Instance != null ) {
-				if( !MotionBlursMod.Instance.ConfigJson.LoadFile() ) {
-					MotionBlursMod.Instance.ConfigJson.SaveFile();
-				}
-			}
-		}
-
-		public static void ResetConfigFromDefaults() {
-			if( Main.netMode != 0 ) {
-				throw new Exception( "Cannot reset to default configs outside of single player." );
-			}
-
-			var new_config = new MotionBlursConfigData();
-			//new_config.SetDefaults();
-
-			MotionBlursMod.Instance.ConfigJson.SetData( new_config );
-			MotionBlursMod.Instance.ConfigJson.SaveFile();
-		}
-
-
-		////////////////
-
+    partial class MotionBlursMod : Mod {
 		public JsonConfig<MotionBlursConfigData> ConfigJson { get; private set; }
 		public MotionBlursConfigData Config { get { return this.ConfigJson.Data; } }
+
 
 
 		////////////////
 
 		public MotionBlursMod() {
-			this.Properties = new ModProperties() {
-				Autoload = true,
-				AutoloadGores = true,
-				AutoloadSounds = true
-			};
-			
 			this.ConfigJson = new JsonConfig<MotionBlursConfigData>( MotionBlursConfigData.ConfigFileName,
 				ConfigurationDataBase.RelativePath, new MotionBlursConfigData() );
 		}
 
-		////////////////
+		////
 
 		public override void Load() {
 			MotionBlursMod.Instance = this;

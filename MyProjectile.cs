@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 
 
 namespace MotionBlurs {
-	class MotionBlursProjectile : GlobalProjectile {
+	class MyProjectile : GlobalProjectile {
 		public ProjectileFxHandler Fx { get; private set; }
 
 

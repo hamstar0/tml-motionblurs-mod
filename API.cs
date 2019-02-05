@@ -16,7 +16,7 @@ namespace MotionBlurs {
 
 				npc_info.Fx.SetCustomIntensity( intensity_func );
 			} else if( ent is Projectile ) {
-				var proj_info = ((Projectile)ent).GetGlobalProjectile<MotionBlursProjectile>();
+				var proj_info = ((Projectile)ent).GetGlobalProjectile<MyProjectile>();
 				if( proj_info == null ) { return; }
 
 				proj_info.Fx.SetCustomIntensity( intensity_func );
@@ -33,7 +33,7 @@ namespace MotionBlurs {
 
 				npc_info.Fx.SetCustomIntensity( null );
 			} else if( ent is Projectile ) {
-				var proj_info = ((Projectile)ent).GetGlobalProjectile<MotionBlursProjectile>();
+				var proj_info = ((Projectile)ent).GetGlobalProjectile<MyProjectile>();
 				if( proj_info == null ) { return; }
 
 				proj_info.Fx.SetCustomIntensity( null );
