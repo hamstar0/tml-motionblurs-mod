@@ -7,27 +7,28 @@ using Terraria.ModLoader;
 
 namespace MotionBlurs {
 	class MotionBlursNpc : GlobalNPC {
-		public NpcFxHandler Fx;
+		public NpcFxHandler Fx { get; private set; }
+
+		////////////////
+
+		public override bool InstancePerEntity => true;
+		//public override bool CloneNewInstances => true;
+
 
 
 		////////////////
 
-		public override bool InstancePerEntity { get { return true; } }
-		public override bool CloneNewInstances { get { return true; } }
-
 		public override void SetDefaults( NPC npc ) {
-			this.Fx = new NpcFxHandler( (MotionBlursMod)this.mod );
+			this.Fx = new NpcFxHandler();
 		}
 
 		////////////////
 
-		public override bool PreDraw( NPC npc, SpriteBatch sb, Color draw_color ) {
-			var mymod = (MotionBlursMod)this.mod;
-			if( !mymod.IsEnabled() ) { return base.PreDraw( npc, sb, draw_color ); }
+		public override bool PreDraw( NPC npc, SpriteBatch sb, Color drawColor ) {
+			this.Fx.Update( npc );
+			this.Fx.RenderTrail( sb, npc, drawColor );
 			
-			this.Fx.RenderTrail( mymod, sb, npc, draw_color );
-			
-			return base.PreDraw( npc, sb, draw_color );
+			return base.PreDraw( npc, sb, drawColor );
 		}
 	}
 }

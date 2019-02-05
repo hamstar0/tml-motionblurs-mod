@@ -32,10 +32,10 @@ namespace MotionBlurs {
 				throw new Exception( "Cannot reset to default configs outside of single player." );
 			}
 
-			var new_config = new MotionBlursConfigData();
-			//new_config.SetDefaults();
+			var newConfig = new MotionBlursConfigData();
+			newConfig.SetDefaults();
 
-			MotionBlursMod.Instance.ConfigJson.SetData( new_config );
+			MotionBlursMod.Instance.ConfigJson.SetData( newConfig );
 			MotionBlursMod.Instance.ConfigJson.SaveFile();
 		}
 	}

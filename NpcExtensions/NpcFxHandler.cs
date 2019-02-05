@@ -1,4 +1,5 @@
-﻿using HamstarHelpers.Helpers.NPCHelpers;
+﻿using HamstarHelpers.Helpers.DebugHelpers;
+using HamstarHelpers.Helpers.NPCHelpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -12,6 +13,7 @@ namespace MotionBlurs.NpcExtensions {
 		}
 
 
+
 		////////////////
 
 		private Vector2[] TrailPositions;
@@ -22,10 +24,11 @@ namespace MotionBlurs.NpcExtensions {
 		public Func<Entity, int> IntensityGetter { get; private set; }
 
 
+
 		////////////////
 
-		public NpcFxHandler( MotionBlursMod mymod ) {
-			int len = mymod.ConfigJson.Data.NpcTrailLength;
+		public NpcFxHandler() {
+			int len = MotionBlursMod.Instance.ConfigJson.Data.NpcTrailLength;
 
 			this.TrailPositions = new Vector2[len];
 			this.TrailRotations = new float[len];
@@ -52,23 +55,25 @@ namespace MotionBlurs.NpcExtensions {
 
 		////////////////
 
-		public void GetRenderColors( NPC npc, Color draw_color, int intensity, out Color main_color, out Color? overlay_color ) {
-			Color base_color_a, base_color_b = default( Color );
-			bool has_added_color = npc.color != default( Color );
+		public void GetRenderColors( NPC npc, Color drawColor, int intensity, out Color mainColor, out Color? overlayColor ) {
+			Color baseColorA, baseColorB = default( Color );
+			bool hasAddedColor = npc.color != default( Color );
 
-			base_color_a = npc.GetAlpha( draw_color );
-			if( has_added_color ) {
-				base_color_b = npc.GetColor( draw_color );
+			baseColorA = npc.GetAlpha( drawColor );
+			if( hasAddedColor ) {
+				baseColorB = npc.GetColor( drawColor );
 			}
 
-			float avg = (float)(base_color_a.R + base_color_a.G + base_color_a.B + base_color_a.A) / 4f;
+			float avg = (float)(baseColorA.R + baseColorA.G + baseColorA.B + baseColorA.A) / 4f;
 			float scale = intensity / avg;
 
-			main_color = Color.Multiply( base_color_a, scale );
-			overlay_color = Color.Multiply( base_color_b, scale );
+			mainColor = Color.Multiply( baseColorA, scale );
+			overlayColor = Color.Multiply( baseColorB, scale );
 		}
 
-		public int GetNpcIntensity( MotionBlursMod mymod, NPC npc ) {
+		public int GetNpcIntensity( NPC npc ) {
+			var mymod = MotionBlursMod.Instance;
+
 			if( this.IntensityGetter != null ) {
 				return this.IntensityGetter( npc );
 			}
@@ -77,33 +82,34 @@ namespace MotionBlurs.NpcExtensions {
 
 		////////////////
 
-		public void SetCustomIntensity( Func<Entity, int> intensity_func ) {
-			this.IntensityGetter = intensity_func;
+		public void SetCustomIntensity( Func<Entity, int> intensityFunc ) {
+			this.IntensityGetter = intensityFunc;
 		}
 
 
 		////////////////
 
-		public void RenderTrail( MotionBlursMod mymod, SpriteBatch sb, NPC npc, Color draw_color ) {
-			int intensity = this.GetNpcIntensity( mymod, npc );
+		public void RenderTrail( SpriteBatch sb, NPC npc, Color drawColor ) {
+			var mymod = MotionBlursMod.Instance;
+			int intensity = this.GetNpcIntensity( npc );
 			if( intensity <= 8 ) { return; }
 
-			Color main_color;
-			Color? overlay_color;
+			Color mainColor;
+			Color? overlayColor;
 
-			this.GetRenderColors( npc, draw_color, intensity, out main_color, out overlay_color );
+			this.GetRenderColors( npc, drawColor, intensity, out mainColor, out overlayColor );
 
-			float re_avg = (float)(main_color.R + main_color.G + main_color.B + main_color.A) / 4f;
-			float inc = mymod.ConfigJson.Data.NpcTrailFadeIncrements / re_avg;
+			float reAvg = (float)(mainColor.R + mainColor.G + mainColor.B + mainColor.A) / 4f;
+			float inc = mymod.ConfigJson.Data.NpcTrailFadeIncrements / reAvg;
 
-			this.RenderTrailWithSettings( sb, npc, main_color, overlay_color, inc );
+			this.RenderTrailWithSettings( sb, npc, mainColor, overlayColor, inc );
 		}
 
 
-		public void RenderTrailWithSettings( SpriteBatch sb, NPC npc, Color main_color, Color? overlay_color, float fade_amount ) {
+		public void RenderTrailWithSettings( SpriteBatch sb, NPC npc, Color mainColor, Color? overlayColor, float fadeAmount ) {
 			Texture2D tex = Main.npcTexture[npc.type];
-			int frame_height = tex.Height / Main.npcFrameCount[npc.type];
-			int frame = npc.frame.Y / frame_height;
+			int frameHeight = tex.Height / Main.npcFrameCount[npc.type];
+			int frame = npc.frame.Y / frameHeight;
 
 //DebugHelpers.SetDisplay( npc.TypeName + "_info", "lit:"+lit+", avg: "+avg.ToString("N2")+", inc:"+inc.ToString("N2"), 30 );
 //DebugHelpers.SetDisplay( npc.TypeName + "_colors", "a:" + color_a + ", b:" + color_b, 30 );
@@ -112,17 +118,18 @@ namespace MotionBlurs.NpcExtensions {
 				float rot = this.TrailRotations[i];
 				Vector2 pos = this.TrailPositions[i];
 				
-				float lerp = i * fade_amount;
+				float lerp = i * fadeAmount;
 
-				Color lerped_color_a = Color.Lerp( main_color, Color.Transparent, lerp );
-				if( lerped_color_a.A <= 8 ) { break; }
+				Color lerpedColorA = Color.Lerp( mainColor, Color.Transparent, lerp );
+				if( lerpedColorA.A <= 8 ) { break; }
 
-				NPCHelpers.DrawSimple( sb, npc, frame, pos, rot, npc.scale, lerped_color_a );
+//DebugHelpers.Print( npc.TypeName+npc.whoAmI+"_"+i, "pos:"+(int)pos.X+":"+(int)pos.Y+", rot:"+rot.ToString("N2")+",color:"+lerpedColorA, 20 );
+				NPCHelpers.DrawSimple( sb, npc, frame, pos, rot, npc.scale, lerpedColorA );
 
-				if( overlay_color.HasValue ) {
-					Color lerped_color_b = Color.Lerp( overlay_color.Value, Color.Transparent, lerp );
+				if( overlayColor.HasValue ) {
+					Color lerpedColorB = Color.Lerp( overlayColor.Value, Color.Transparent, lerp );
 
-					NPCHelpers.DrawSimple( sb, npc, frame, pos, rot, npc.scale, lerped_color_b );
+					NPCHelpers.DrawSimple( sb, npc, frame, pos, rot, npc.scale, lerpedColorB );
 				}
 //list.Add( "R:" + lerped_color_a.R + "+G:" + lerped_color_a.G + "+B:" +lerped_color_a.B+"+A:" +lerped_color_a.A );
 			}

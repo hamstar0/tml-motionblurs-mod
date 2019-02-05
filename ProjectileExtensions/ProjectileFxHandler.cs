@@ -1,4 +1,5 @@
-﻿using HamstarHelpers.Helpers.ProjectileHelpers;
+﻿using HamstarHelpers.Helpers.DebugHelpers;
+using HamstarHelpers.Helpers.ProjectileHelpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -12,6 +13,7 @@ namespace MotionBlurs.ProjectileExtensions {
 		}
 
 
+
 		////////////////
 
 		private Vector2[] TrailPositions;
@@ -22,15 +24,16 @@ namespace MotionBlurs.ProjectileExtensions {
 		public Func<Entity, int> IntensityGetter { get; private set; }
 
 
+
 		////////////////
 
-		public ProjectileFxHandler( MotionBlursMod mymod ) {
+		public ProjectileFxHandler() {
+			var mymod = MotionBlursMod.Instance;
 			int len = mymod.ConfigJson.Data.ProjTrailLength;
 
 			this.TrailPositions = new Vector2[len];
 			this.TrailRotations = new float[len];
 			this.IntensityGetter = null;
-			;
 		}
 
 		////////////////
@@ -52,16 +55,18 @@ namespace MotionBlurs.ProjectileExtensions {
 
 		////////////////
 
-		public void GetRenderColors( Projectile proj, Color draw_color, int intensity, out Color main_color ) {
-			Color base_color = proj.GetAlpha( draw_color );
+		public void GetRenderColors( Projectile proj, Color drawColor, int intensity, out Color mainColor ) {
+			Color baseColor = proj.GetAlpha( drawColor );
 
-			float avg = (float)(base_color.R + base_color.G + base_color.B + base_color.A) / 4f;
+			float avg = (float)(baseColor.R + baseColor.G + baseColor.B + baseColor.A) / 4f;
 			float scale = intensity / avg;
 
-			main_color = Color.Multiply( base_color, scale );
+			mainColor = Color.Multiply( baseColor, scale );
 		}
 
-		public int GetProjectileIntensity( MotionBlursMod mymod, Projectile proj ) {
+		public int GetProjectileIntensity( Projectile proj ) {
+			var mymod = MotionBlursMod.Instance;
+
 			if( this.IntensityGetter != null ) {
 				return this.IntensityGetter( proj );
 			}
@@ -70,29 +75,30 @@ namespace MotionBlurs.ProjectileExtensions {
 
 		////////////////
 
-		public void SetCustomIntensity( Func<Entity, int> intensity_func ) {
-			this.IntensityGetter = intensity_func;
+		public void SetCustomIntensity( Func<Entity, int> intensityFunc ) {
+			this.IntensityGetter = intensityFunc;
 		}
 
 
 		////////////////
 
-		public void RenderTrail( MotionBlursMod mymod, SpriteBatch sb, Projectile proj, Color draw_color ) {
-			int intensity = this.GetProjectileIntensity( mymod, proj );
+		public void RenderTrail( SpriteBatch sb, Projectile proj, Color drawColor ) {
+			var mymod = MotionBlursMod.Instance;
+			int intensity = this.GetProjectileIntensity( proj );
 			if( intensity <= 8 ) { return; }
+			
+			Color mainColor;
 
-			Color main_color;
+			this.GetRenderColors( proj, drawColor, intensity, out mainColor );
 
-			this.GetRenderColors( proj, draw_color, intensity, out main_color );
+			float reAvg = (float)(mainColor.R + mainColor.G + mainColor.B + mainColor.A) / 4f;
+			float fade_amount = mymod.ConfigJson.Data.ProjTrailFadeIncrements / reAvg;
 
-			float re_avg = (float)(main_color.R + main_color.G + main_color.B + main_color.A) / 4f;
-			float fade_amount = mymod.ConfigJson.Data.ProjTrailFadeIncrements / re_avg;
-
-			this.RenderTrailWithSettings( sb, proj, main_color, fade_amount );
+			this.RenderTrailWithSettings( sb, proj, mainColor, fade_amount );
 		}
 
 
-		public void RenderTrailWithSettings( SpriteBatch sb, Projectile proj, Color main_color, float fade_amount ) {
+		public void RenderTrailWithSettings( SpriteBatch sb, Projectile proj, Color mainColor, float fadeAmount ) {
 //DebugHelpers.SetDisplay( proj.Name + "_info", "lit:"+lit+", avg: "+ re_avg.ToString("N2")+", inc:"+inc.ToString("N2")+ ", scale:"+ scale.ToString("N2"), 30 );
 //DebugHelpers.SetDisplay( proj.Name + "_colors", "base:" + base_color + ", color:" + color, 30 );
 //var list = new List<string>();
@@ -100,12 +106,13 @@ namespace MotionBlurs.ProjectileExtensions {
 				float rot = this.TrailRotations[i];
 				Vector2 pos = this.TrailPositions[i];
 
-				float lerp = i * fade_amount;
+				float lerp = i * fadeAmount;
 
-				Color lerped_color = Color.Lerp( main_color, Color.Transparent, lerp );
-				if( lerped_color.A <= 8 ) { break; }
+				Color lerpedColor = Color.Lerp( mainColor, Color.Transparent, lerp );
+				if( lerpedColor.A <= 8 ) { break; }
 
-				ProjectileHelpers.DrawSimple( sb, proj, pos, rot, lerped_color, proj.scale );
+//DebugHelpers.Print( proj.Name+proj.whoAmI+"_"+i, "pos:"+(int)pos.X+":"+(int)pos.Y+", rot:"+rot.ToString("N2")+",color:"+lerpedColor, 20 );
+				ProjectileHelpers.DrawSimple( sb, proj, pos, rot, lerpedColor, proj.scale );
 //list.Add( "R:" + lerped_color.R + "+G:" + lerped_color.G + "+B:" + lerped_color.B+"+A:" + lerped_color.A );
 			}
 //DebugHelpers.SetDisplay( proj.Name + "_trail", string.Join(", ",list.ToArray()), 30 );

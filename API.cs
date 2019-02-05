@@ -9,17 +9,17 @@ namespace MotionBlurs {
 		}
 
 
-		public static void BeginCustomEntityBlur( Entity ent, Func<Entity, int> intensity_func ) {
+		public static void BeginCustomEntityBlur( Entity ent, Func<Entity, int> intensityFunc ) {
 			if( ent is NPC ) {
-				var npc_info = ((NPC)ent).GetGlobalNPC<MotionBlursNpc>();
-				if( npc_info == null ) { return; }
+				var npcInfo = ((NPC)ent).GetGlobalNPC<MotionBlursNpc>();
+				if( npcInfo == null ) { return; }
 
-				npc_info.Fx.SetCustomIntensity( intensity_func );
+				npcInfo.Fx.SetCustomIntensity( intensityFunc );
 			} else if( ent is Projectile ) {
-				var proj_info = ((Projectile)ent).GetGlobalProjectile<MyProjectile>();
-				if( proj_info == null ) { return; }
+				var projInfo = ((Projectile)ent).GetGlobalProjectile<MyProjectile>();
+				if( projInfo == null ) { return; }
 
-				proj_info.Fx.SetCustomIntensity( intensity_func );
+				projInfo.Fx.SetCustomIntensity( intensityFunc );
 			} else {
 				throw new Exception( "Invalid entity type." );
 			}
@@ -28,15 +28,15 @@ namespace MotionBlurs {
 
 		public static void EndCustomEntityBlur( Entity ent ) {
 			if( ent is NPC ) {
-				var npc_info = ((NPC)ent).GetGlobalNPC<MotionBlursNpc>();
-				if( npc_info == null ) { return; }
+				var npcInfo = ((NPC)ent).GetGlobalNPC<MotionBlursNpc>();
+				if( npcInfo == null ) { return; }
 
-				npc_info.Fx.SetCustomIntensity( null );
+				npcInfo.Fx.SetCustomIntensity( null );
 			} else if( ent is Projectile ) {
-				var proj_info = ((Projectile)ent).GetGlobalProjectile<MyProjectile>();
-				if( proj_info == null ) { return; }
+				var projInfo = ((Projectile)ent).GetGlobalProjectile<MyProjectile>();
+				if( projInfo == null ) { return; }
 
-				proj_info.Fx.SetCustomIntensity( null );
+				projInfo.Fx.SetCustomIntensity( null );
 			} else {
 				throw new Exception( "Invalid entity type." );
 			}
