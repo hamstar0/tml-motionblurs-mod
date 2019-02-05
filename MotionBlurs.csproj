@@ -57,7 +57,7 @@
     <Compile Include="API.cs" />
     <Compile Include="ConfigDefaults.cs" />
     <Compile Include="MyMod_Meta.cs" />
-    <Compile Include="MotionBlursMod.cs" />
+    <Compile Include="MyMod.cs" />
     <Compile Include="MyNpc.cs" />
     <Compile Include="MyProjectile.cs" />
     <Compile Include="NpcExtensions\NpcFxHandler.cs" />
