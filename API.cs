@@ -4,11 +4,6 @@ using Terraria;
 
 namespace MotionBlurs {
 	public static class MotionBlursAPI {
-		public static MotionBlursConfigData GetModSettings() {
-			return MotionBlursMod.Instance.ConfigJson.Data;
-		}
-
-
 		public static void BeginCustomEntityBlur( Entity ent, Func<Entity, int> intensityFunc ) {
 			if( ent is NPC ) {
 				var npcInfo = ((NPC)ent).GetGlobalNPC<MotionBlursNpc>();

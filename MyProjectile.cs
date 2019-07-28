@@ -1,4 +1,4 @@
-﻿using HamstarHelpers.Helpers.DebugHelpers;
+﻿using HamstarHelpers.Helpers.Debug;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MotionBlurs.ProjectileExtensions;
@@ -27,11 +27,11 @@ namespace MotionBlurs {
 
 		////////////////
 
-		public override bool PreDraw( Projectile projectile, SpriteBatch sb, Color light_color ) {
+		public override bool PreDraw( Projectile projectile, SpriteBatch sb, Color lightColor ) {
 			this.Fx.Update( projectile );
-			this.Fx.RenderTrail( sb, projectile, light_color );
+			this.Fx.RenderTrail( sb, projectile, lightColor );
 
-			return base.PreDraw( projectile, sb, light_color );
+			return base.PreDraw( projectile, sb, lightColor );
 		}
 	}
 }

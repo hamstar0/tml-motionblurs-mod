@@ -1,5 +1,5 @@
-﻿using HamstarHelpers.Helpers.DebugHelpers;
-using HamstarHelpers.Helpers.NPCHelpers;
+﻿using HamstarHelpers.Helpers.Debug;
+using HamstarHelpers.Helpers.NPCs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -8,8 +8,10 @@ using Terraria;
 
 namespace MotionBlurs.NpcExtensions {
 	class NpcFxHandler {
-		public static int GetDefaultNpcIntensity( MotionBlursConfigData data, NPC npc ) {
-			return (int)Math.Min( data.NpcMaxIntensity, (float)data.NpcBaseIntensity * npc.velocity.Length() );
+		public static int GetDefaultNpcIntensity( NPC npc ) {
+			var mymod = MotionBlursMod.Instance;
+
+			return (int)Math.Min( mymod.Config.NpcMaxIntensity, (float)mymod.Config.NpcBaseIntensity * npc.velocity.Length() );
 		}
 
 
@@ -28,7 +30,7 @@ namespace MotionBlurs.NpcExtensions {
 		////////////////
 
 		public NpcFxHandler() {
-			int len = MotionBlursMod.Instance.ConfigJson.Data.NpcTrailLength;
+			int len = MotionBlursMod.Instance.Config.NpcTrailLength;
 
 			this.TrailPositions = new Vector2[len];
 			this.TrailRotations = new float[len];
@@ -77,7 +79,7 @@ namespace MotionBlurs.NpcExtensions {
 			if( this.IntensityGetter != null ) {
 				return this.IntensityGetter( npc );
 			}
-			return NpcFxHandler.GetDefaultNpcIntensity( mymod.ConfigJson.Data, npc );
+			return NpcFxHandler.GetDefaultNpcIntensity( npc );
 		}
 
 		////////////////
@@ -100,7 +102,7 @@ namespace MotionBlurs.NpcExtensions {
 			this.GetRenderColors( npc, drawColor, intensity, out mainColor, out overlayColor );
 
 			float reAvg = (float)(mainColor.R + mainColor.G + mainColor.B + mainColor.A) / 4f;
-			float inc = mymod.ConfigJson.Data.NpcTrailFadeIncrements / reAvg;
+			float inc = mymod.Config.NpcTrailFadeIncrements / reAvg;
 
 			this.RenderTrailWithSettings( sb, npc, mainColor, overlayColor, inc );
 		}
@@ -124,12 +126,12 @@ namespace MotionBlurs.NpcExtensions {
 				if( lerpedColorA.A <= 8 ) { break; }
 
 //DebugHelpers.Print( npc.TypeName+npc.whoAmI+"_"+i, "pos:"+(int)pos.X+":"+(int)pos.Y+", rot:"+rot.ToString("N2")+",color:"+lerpedColorA, 20 );
-				NPCHelpers.DrawSimple( sb, npc, frame, pos, rot, npc.scale, lerpedColorA );
+				NPCDrawHelpers.DrawSimple( sb, npc, frame, pos, rot, npc.scale, lerpedColorA );
 
 				if( overlayColor.HasValue ) {
 					Color lerpedColorB = Color.Lerp( overlayColor.Value, Color.Transparent, lerp );
 
-					NPCHelpers.DrawSimple( sb, npc, frame, pos, rot, npc.scale, lerpedColorB );
+					NPCDrawHelpers.DrawSimple( sb, npc, frame, pos, rot, npc.scale, lerpedColorB );
 				}
 //list.Add( "R:" + lerped_color_a.R + "+G:" + lerped_color_a.G + "+B:" +lerped_color_a.B+"+A:" +lerped_color_a.A );
 			}

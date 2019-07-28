@@ -1,5 +1,5 @@
-﻿using HamstarHelpers.Helpers.DebugHelpers;
-using HamstarHelpers.Helpers.ProjectileHelpers;
+﻿using HamstarHelpers.Helpers.Debug;
+using HamstarHelpers.Helpers.Projectiles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -8,7 +8,7 @@ using Terraria;
 
 namespace MotionBlurs.ProjectileExtensions {
 	class ProjectileFxHandler {
-		public static int GetDefaultProjectileIntensity( MotionBlursConfigData data, Projectile proj ) {
+		public static int GetDefaultProjectileIntensity( MotionBlursConfig data, Projectile proj ) {
 			return (int)Math.Min( data.ProjMaxIntensity, (float)data.ProjBaseIntensity * proj.velocity.Length() );
 		}
 
@@ -29,7 +29,7 @@ namespace MotionBlurs.ProjectileExtensions {
 
 		public ProjectileFxHandler() {
 			var mymod = MotionBlursMod.Instance;
-			int len = mymod.ConfigJson.Data.ProjTrailLength;
+			int len = mymod.Config.ProjTrailLength;
 
 			this.TrailPositions = new Vector2[len];
 			this.TrailRotations = new float[len];
@@ -70,7 +70,7 @@ namespace MotionBlurs.ProjectileExtensions {
 			if( this.IntensityGetter != null ) {
 				return this.IntensityGetter( proj );
 			}
-			return ProjectileFxHandler.GetDefaultProjectileIntensity( mymod.ConfigJson.Data, proj );
+			return ProjectileFxHandler.GetDefaultProjectileIntensity( mymod.Config, proj );
 		}
 
 		////////////////
@@ -92,7 +92,7 @@ namespace MotionBlurs.ProjectileExtensions {
 			this.GetRenderColors( proj, drawColor, intensity, out mainColor );
 
 			float reAvg = (float)(mainColor.R + mainColor.G + mainColor.B + mainColor.A) / 4f;
-			float fade_amount = mymod.ConfigJson.Data.ProjTrailFadeIncrements / reAvg;
+			float fade_amount = mymod.Config.ProjTrailFadeIncrements / reAvg;
 
 			this.RenderTrailWithSettings( sb, proj, mainColor, fade_amount );
 		}

@@ -1,57 +1,33 @@
-﻿using HamstarHelpers.Components.Config;
-using System;
+﻿using System;
+using System.ComponentModel;
+using Terraria.ModLoader.Config;
 
 
 namespace MotionBlurs {
-	public class MotionBlursConfigData : ConfigurationDataBase {
-		public readonly static string ConfigFileName = "Motion Blurs Config.json";
+	public class MotionBlursConfig : ModConfig {
+		public override ConfigScope Mode => ConfigScope.ServerSide;
 
-
-		////////////////
-
-		public string VersionSinceUpdate = "";
-		
-		public int NpcTrailLength = 17;
-		public int ProjTrailLength = 12;
-
-		public float NpcTrailFadeIncrements = 8f;
-		public float ProjTrailFadeIncrements = 10f;
-
-		public int NpcBaseIntensity = 11;
-		public int ProjBaseIntensity = 8;
-
-		public int NpcMaxIntensity = 128;
-		public int ProjMaxIntensity = 96;
-
-
-
-		////////////////
-
-		public void SetDefaults() {
-		}
 
 		////
 
-		public bool UpdateToLatestVersion() {
-			var mymod = MotionBlursMod.Instance;
-			var newConfig = new MotionBlursConfigData();
-			newConfig.SetDefaults();
+		[DefaultValue( 17 )]
+		public int NpcTrailLength = 17;
+		[DefaultValue( 12 )]
+		public int ProjTrailLength = 12;
 
-			var versSince = this.VersionSinceUpdate != "" ?
-				new Version( this.VersionSinceUpdate ) :
-				new Version();
+		[DefaultValue( 8f )]
+		public float NpcTrailFadeIncrements = 8f;
+		[DefaultValue( 10f )]
+		public float ProjTrailFadeIncrements = 10f;
 
-			if( versSince >= mymod.Version ) {
-				return false;
-			}
+		[DefaultValue( 11 )]
+		public int NpcBaseIntensity = 11;
+		[DefaultValue( 8 )]
+		public int ProjBaseIntensity = 8;
 
-			if( this.VersionSinceUpdate == "" ) {
-				this.SetDefaults();
-			}
-
-			this.VersionSinceUpdate = mymod.Version.ToString();
-
-			return true;
-		}
+		[DefaultValue( 128 )]
+		public int NpcMaxIntensity = 128;
+		[DefaultValue( 96 )]
+		public int ProjMaxIntensity = 96;
 	}
 }
