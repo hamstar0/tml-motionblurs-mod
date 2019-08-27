@@ -5,7 +5,7 @@ using Terraria.ModLoader.Config;
 
 namespace MotionBlurs {
 	public class MotionBlursConfig : ModConfig {
-		public override ConfigScope Mode => ConfigScope.ServerSide;
+		public override ConfigScope Mode => ConfigScope.ClientSide;
 
 
 		////
