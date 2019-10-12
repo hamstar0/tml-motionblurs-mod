@@ -13,7 +13,7 @@ namespace MotionBlurs {
 
 		////////////////
 
-		public MotionBlursConfig Config => this.GetConfig<MotionBlursConfig>();
+		public MotionBlursConfig Config => ModContent.GetInstance<MotionBlursConfig>();
 
 
 
