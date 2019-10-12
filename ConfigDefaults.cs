@@ -5,6 +5,11 @@ using Terraria.ModLoader.Config;
 
 
 namespace MotionBlurs {
+	class MyFloatInputElement : FloatInputElement { }
+
+
+
+
 	public class MotionBlursConfig : ModConfig {
 		public override ConfigScope Mode => ConfigScope.ClientSide;
 
@@ -22,12 +27,12 @@ namespace MotionBlurs {
 
 		[Range( 0f, 1000f )]
 		[DefaultValue( 8f )]
-		[CustomModConfigItem( typeof( FloatInputElement ) )]
+		[CustomModConfigItem( typeof( MyFloatInputElement ) )]
 		public float NpcTrailFadeIncrements = 8f;
 
 		[Range( 0f, 1000f )]
 		[DefaultValue( 10f )]
-		[CustomModConfigItem( typeof( FloatInputElement ) )]
+		[CustomModConfigItem( typeof( MyFloatInputElement ) )]
 		public float ProjTrailFadeIncrements = 10f;
 
 
